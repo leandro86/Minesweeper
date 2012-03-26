@@ -18,7 +18,14 @@ namespace MinesweeperClone.UI
         private readonly int _formMargin;
         private GridSquare _previousClickedSquare;
 
-        private bool _hasGameStarted;
+        private enum GameState
+        {
+            NotStarted,
+            Playing,
+            Ended
+        }
+
+        private GameState _currentGameState;
 
         public MainForm()
         {
@@ -35,7 +42,10 @@ namespace MinesweeperClone.UI
         {
             timer.Stop();
             gridArea.Visible = false;
-            _hasGameStarted = false;
+            _currentGameState = GameState.NotStarted;
+            
+            _previousClickedSquare.Row = 0;
+            _previousClickedSquare.Column = 0;
 
             minesLeftLabel.Text = _currentGameOptions.GridMines.ToString();
             elapsedTimeLabel.Text = "0";
@@ -67,50 +77,40 @@ namespace MinesweeperClone.UI
             CenterToScreen();
         }
 
-        private void RevealSquare(int row, int column)
+        private Square RevealSquare(int row, int column)
         {
-            if (_minesweeper[row, column] != Square.Unopened)
+            if (_minesweeper[row, column] == Square.Unopened)
             {
-                return;
-            }
-            
-            Square revealedSquare = _minesweeper.RevealSquare(row, column);
-            DrawImage(gridArea.CreateGraphics(), revealedSquare, row, column);
+                Square revealedSquare = _minesweeper.RevealSquare(row, column);
+                DrawImage(gridArea.CreateGraphics(), revealedSquare, row, column);
 
-            if (revealedSquare == Square.Mine)
-            {
-                GameLost();
-            }
-            else if (revealedSquare == Square.Blank)
-            {
-                foreach (GridSquare adjacentSquare in _minesweeper.GetAdjacentSquares(row, column))
+                if (revealedSquare == Square.Mine)
                 {
-                    RevealSquare(adjacentSquare.Row, adjacentSquare.Column);
+                    GameEnded(false);
+                }
+                else if (revealedSquare == Square.Blank)
+                {
+                    foreach (GridSquare adjacentSquare in _minesweeper.GetAdjacentSquares(row, column))
+                    {
+                        RevealSquare(adjacentSquare.Row, adjacentSquare.Column);
+                    }
                 }
             }
+
+            return _minesweeper[row, column];
         }
 
-        private void GameLost()
-        {           
-            timer.Stop();
-            gridArea.Enabled = false;
-            _hasGameStarted = false;
-
-            MessageBox.Show("You Lost :(", "Minesweeper");
-            ShowMines();
-        }
-
-        private void GameWon()
+        private void GameEnded(bool won)
         {
             timer.Stop();
             gridArea.Enabled = false;
-            _hasGameStarted = false;
+            _currentGameState = GameState.Ended;            
 
-            MessageBox.Show("You Won!", "Minesweeper");
-            ShowMines();
+            MessageBox.Show(won ? "You Won!" : "You Lost :(", "Minesweeper");
+            RevealMines();
         }
 
-        private void ShowMines()
+        private void RevealMines()
         {
             foreach (GridSquare mine in _minesweeper.GetAllMines())
             {
@@ -155,12 +155,6 @@ namespace MinesweeperClone.UI
 
         private void gridArea_MouseDown(object sender, MouseEventArgs e)
         {
-            if (!_hasGameStarted)
-            {
-                _hasGameStarted = true;
-                timer.Start();
-            }
-
             GridSquare clickedSquare = GetClickedSquare(e.X, e.Y);
 
             if (_minesweeper[clickedSquare.Row, clickedSquare.Column] == Square.Unopened || 
@@ -172,7 +166,7 @@ namespace MinesweeperClone.UI
 
                     if (_minesweeper.SquaresLeft == _currentGameOptions.GridMines)
                     {
-                        GameWon();
+                        GameEnded(true);
                     }
                 }
                 else if (e.Button == MouseButtons.Right)
@@ -193,6 +187,12 @@ namespace MinesweeperClone.UI
                     DrawImage(gridArea.CreateGraphics(), square, clickedSquare.Row, clickedSquare.Column);
                 }
             }
+
+            if (_currentGameState == GameState.NotStarted)
+            {
+                timer.Start();
+                _currentGameState = GameState.Playing;
+            }
         }
 
         private GridSquare GetClickedSquare(int x, int y)
@@ -202,7 +202,7 @@ namespace MinesweeperClone.UI
 
         private void gridArea_MouseMove(object sender, MouseEventArgs e)
         {
-            if (!_hasGameStarted)
+            if (_currentGameState != GameState.Playing)
             {
                 return;
             }
