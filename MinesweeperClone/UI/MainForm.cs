@@ -50,7 +50,7 @@ namespace MinesweeperClone.UI
             minesLeftLabel.Text = _currentGameOptions.GridMines.ToString();
             elapsedTimeLabel.Text = "0";
 
-            _minesweeper = new Minesweeper(_currentGameOptions.GridColumns, _currentGameOptions.GridRows,
+            _minesweeper = new Minesweeper(_currentGameOptions.GridRows, _currentGameOptions.GridColumns,
                                            _currentGameOptions.GridMines);
 
             AdjustControlsPosition();
@@ -238,6 +238,24 @@ namespace MinesweeperClone.UI
         {
             Bitmap image = (Bitmap)Properties.Resources.ResourceManager.GetObject(square.ToString());
             g.DrawImage(image, column * SquareSize, row * SquareSize, SquareSize, SquareSize);
+        }
+
+        private void ShowMines()
+        {
+            foreach (GridSquare mine in _minesweeper.GetAllMines())
+            {
+                DrawImage(gridArea.CreateGraphics(), Square.Mine, mine.Row, mine.Column);
+            }
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            //TODO: remove, only for testing
+            if (e.KeyCode == Keys.Space)
+            {
+                ShowMines();
+            }
+            gridArea.Invalidate();
         }
     }
 }

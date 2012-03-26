@@ -36,14 +36,14 @@
             this.optionsMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.timer = new System.Windows.Forms.Timer(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
-            this.backgroundPanel = new System.Windows.Forms.Panel();
             this.gridArea = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.minePicture = new System.Windows.Forms.PictureBox();
             this.elapsedTimeLabel = new System.Windows.Forms.Label();
             this.minesLeftLabel = new System.Windows.Forms.Label();
-            this.timer = new System.Windows.Forms.Timer(this.components);
+            this.backgroundPanel = new System.Windows.Forms.Panel();
             this.menu.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridArea)).BeginInit();
@@ -99,6 +99,11 @@
             this.exitMenu.Text = "Exit";
             this.exitMenu.Click += new System.EventHandler(this.exitMenu_Click);
             // 
+            // timer
+            // 
+            this.timer.Interval = 1000;
+            this.timer.Tick += new System.EventHandler(this.timer_Tick);
+            // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.LightSteelBlue;
@@ -115,14 +120,6 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(278, 344);
             this.panel1.TabIndex = 1;
-            // 
-            // backgroundPanel
-            // 
-            this.backgroundPanel.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("backgroundPanel.BackgroundImage")));
-            this.backgroundPanel.Location = new System.Drawing.Point(125, 9);
-            this.backgroundPanel.Name = "backgroundPanel";
-            this.backgroundPanel.Size = new System.Drawing.Size(48, 30);
-            this.backgroundPanel.TabIndex = 15;
             // 
             // gridArea
             // 
@@ -179,10 +176,13 @@
             this.minesLeftLabel.TabIndex = 10;
             this.minesLeftLabel.Text = "0";
             // 
-            // timer
+            // backgroundPanel
             // 
-            this.timer.Interval = 1000;
-            this.timer.Tick += new System.EventHandler(this.timer_Tick);
+            this.backgroundPanel.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("backgroundPanel.BackgroundImage")));
+            this.backgroundPanel.Location = new System.Drawing.Point(125, 9);
+            this.backgroundPanel.Name = "backgroundPanel";
+            this.backgroundPanel.Size = new System.Drawing.Size(48, 30);
+            this.backgroundPanel.TabIndex = 15;
             // 
             // MainForm
             // 
@@ -197,6 +197,7 @@
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Minesweeper";
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
             this.menu.ResumeLayout(false);
             this.menu.PerformLayout();
             this.panel1.ResumeLayout(false);

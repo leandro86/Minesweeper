@@ -15,7 +15,7 @@ namespace MinesweeperClone.Logic
         private Square[,] _grid;
         private List<int> _minesLocation;
 
-        public Minesweeper(int columns, int rows, int mines)
+        public Minesweeper(int rows, int columns, int mines)
         {
             Rows = rows;
             Columns = columns;
@@ -33,7 +33,7 @@ namespace MinesweeperClone.Logic
 
             foreach (GridSquare adjacentSquare in GetAdjacentSquares(row, column))
             {
-                int mineLocation = (adjacentSquare.Row * Rows) + adjacentSquare.Column;
+                int mineLocation = (adjacentSquare.Row * Columns) + adjacentSquare.Column;
                 if (_minesLocation.Contains(mineLocation))
                 {
                     minesCount++;
@@ -67,7 +67,7 @@ namespace MinesweeperClone.Logic
         {
             if (_grid[row, column] == Square.Unopened)
             {
-                int mineLocation = (row * Rows) + column;
+                int mineLocation = (row * Columns) + column;
                 _grid[row, column] = _minesLocation.Contains(mineLocation)
                                          ? Square.Mine
                                          : (Square)CountAdjacentMines(row, column);
