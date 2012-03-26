@@ -73,26 +73,27 @@
             // newGameMenu
             // 
             this.newGameMenu.Name = "newGameMenu";
-            this.newGameMenu.Size = new System.Drawing.Size(132, 22);
+            this.newGameMenu.ShortcutKeys = System.Windows.Forms.Keys.F2;
+            this.newGameMenu.Size = new System.Drawing.Size(152, 22);
             this.newGameMenu.Text = "New Game";
             this.newGameMenu.Click += new System.EventHandler(this.newGameMenu_Click);
             // 
             // optionsMenu
             // 
             this.optionsMenu.Name = "optionsMenu";
-            this.optionsMenu.Size = new System.Drawing.Size(132, 22);
+            this.optionsMenu.Size = new System.Drawing.Size(152, 22);
             this.optionsMenu.Text = "Options";
             this.optionsMenu.Click += new System.EventHandler(this.optionsMenu_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(129, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
             // 
             // exitMenu
             // 
             this.exitMenu.Name = "exitMenu";
-            this.exitMenu.Size = new System.Drawing.Size(132, 22);
+            this.exitMenu.Size = new System.Drawing.Size(152, 22);
             this.exitMenu.Text = "Exit";
             this.exitMenu.Click += new System.EventHandler(this.exitMenu_Click);
             // 

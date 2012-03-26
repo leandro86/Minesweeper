@@ -154,6 +154,7 @@ namespace MinesweeperClone.UI
             gridPanel.Enabled = false;
 
             MessageBox.Show("You Lost :(", "Minesweeper");
+            ShowMines();
         }
 
         private void GameWon()
@@ -162,6 +163,15 @@ namespace MinesweeperClone.UI
             gridPanel.Enabled = false;
 
             MessageBox.Show("You Won!", "Minesweeper");
+            ShowMines();
+        }
+
+        private void ShowMines()
+        {
+            foreach (Tuple<int, int> mine in _minesweeper.GetAllMines())
+            {
+                _squares[mine.Item1, mine.Item2].Image = Properties.Resources.Mine;
+            }
         }
 
         private void exitMenu_Click(object sender, EventArgs e)
