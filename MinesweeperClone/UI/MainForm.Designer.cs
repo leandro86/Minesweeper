@@ -37,14 +37,16 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.backgroundPanel = new System.Windows.Forms.Panel();
+            this.gridArea = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.minePicture = new System.Windows.Forms.PictureBox();
             this.elapsedTimeLabel = new System.Windows.Forms.Label();
             this.minesLeftLabel = new System.Windows.Forms.Label();
-            this.gridPanel = new System.Windows.Forms.Panel();
             this.timer = new System.Windows.Forms.Timer(this.components);
             this.menu.SuspendLayout();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridArea)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.minePicture)).BeginInit();
             this.SuspendLayout();
@@ -74,26 +76,26 @@
             // 
             this.newGameMenu.Name = "newGameMenu";
             this.newGameMenu.ShortcutKeys = System.Windows.Forms.Keys.F2;
-            this.newGameMenu.Size = new System.Drawing.Size(152, 22);
+            this.newGameMenu.Size = new System.Drawing.Size(151, 22);
             this.newGameMenu.Text = "New Game";
             this.newGameMenu.Click += new System.EventHandler(this.newGameMenu_Click);
             // 
             // optionsMenu
             // 
             this.optionsMenu.Name = "optionsMenu";
-            this.optionsMenu.Size = new System.Drawing.Size(152, 22);
+            this.optionsMenu.Size = new System.Drawing.Size(151, 22);
             this.optionsMenu.Text = "Options";
             this.optionsMenu.Click += new System.EventHandler(this.optionsMenu_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(148, 6);
             // 
             // exitMenu
             // 
             this.exitMenu.Name = "exitMenu";
-            this.exitMenu.Size = new System.Drawing.Size(152, 22);
+            this.exitMenu.Size = new System.Drawing.Size(151, 22);
             this.exitMenu.Text = "Exit";
             this.exitMenu.Click += new System.EventHandler(this.exitMenu_Click);
             // 
@@ -102,16 +104,36 @@
             this.panel1.BackColor = System.Drawing.Color.LightSteelBlue;
             this.panel1.BackgroundImage = global::MinesweeperClone.Properties.Resources.Background1;
             this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.panel1.Controls.Add(this.gridArea);
             this.panel1.Controls.Add(this.pictureBox2);
             this.panel1.Controls.Add(this.minePicture);
             this.panel1.Controls.Add(this.elapsedTimeLabel);
             this.panel1.Controls.Add(this.minesLeftLabel);
-            this.panel1.Controls.Add(this.gridPanel);
+            this.panel1.Controls.Add(this.backgroundPanel);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(278, 344);
             this.panel1.TabIndex = 1;
+            // 
+            // backgroundPanel
+            // 
+            this.backgroundPanel.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("backgroundPanel.BackgroundImage")));
+            this.backgroundPanel.Location = new System.Drawing.Point(125, 9);
+            this.backgroundPanel.Name = "backgroundPanel";
+            this.backgroundPanel.Size = new System.Drawing.Size(48, 30);
+            this.backgroundPanel.TabIndex = 15;
+            // 
+            // gridArea
+            // 
+            this.gridArea.Location = new System.Drawing.Point(12, 45);
+            this.gridArea.Name = "gridArea";
+            this.gridArea.Size = new System.Drawing.Size(254, 287);
+            this.gridArea.TabIndex = 14;
+            this.gridArea.TabStop = false;
+            this.gridArea.Paint += new System.Windows.Forms.PaintEventHandler(this.gridArea_Paint);
+            this.gridArea.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridArea_MouseDown);
+            this.gridArea.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gridArea_MouseMove);
             // 
             // pictureBox2
             // 
@@ -157,14 +179,6 @@
             this.minesLeftLabel.TabIndex = 10;
             this.minesLeftLabel.Text = "0";
             // 
-            // gridPanel
-            // 
-            this.gridPanel.BackColor = System.Drawing.Color.AliceBlue;
-            this.gridPanel.Location = new System.Drawing.Point(15, 45);
-            this.gridPanel.Name = "gridPanel";
-            this.gridPanel.Size = new System.Drawing.Size(247, 286);
-            this.gridPanel.TabIndex = 9;
-            // 
             // timer
             // 
             this.timer.Interval = 1000;
@@ -187,6 +201,7 @@
             this.menu.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridArea)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.minePicture)).EndInit();
             this.ResumeLayout(false);
@@ -200,7 +215,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label elapsedTimeLabel;
         private System.Windows.Forms.Label minesLeftLabel;
-        private System.Windows.Forms.Panel gridPanel;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.PictureBox minePicture;
         private System.Windows.Forms.ToolStripMenuItem gameToolStripMenuItem;
@@ -209,6 +223,8 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem exitMenu;
         private System.Windows.Forms.Timer timer;
+        private System.Windows.Forms.PictureBox gridArea;
+        private System.Windows.Forms.Panel backgroundPanel;
 
     }
 }

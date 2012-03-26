@@ -137,13 +137,6 @@ namespace MinesweeperClone.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap Six {
-            get {
-                object obj = ResourceManager.GetObject("Six", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         internal static System.Drawing.Bitmap Three {
             get {
                 object obj = ResourceManager.GetObject("Three", resourceCulture);
@@ -161,6 +154,13 @@ namespace MinesweeperClone.Properties {
         internal static System.Drawing.Bitmap Unopened {
             get {
                 object obj = ResourceManager.GetObject("Unopened", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap UnopenedBright {
+            get {
+                object obj = ResourceManager.GetObject("UnopenedBright", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

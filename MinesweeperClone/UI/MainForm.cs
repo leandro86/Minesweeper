@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Reflection;
+using System.Threading;
 using System.Windows.Forms;
 using MinesweeperClone.Logic;
 
@@ -9,20 +11,22 @@ namespace MinesweeperClone.UI
     public partial class MainForm : Form
     {
         private Minesweeper _minesweeper;
-        private PictureBox[,] _squares;
-        private Dictionary<PictureBox, Tuple<int, int>> _squaresDictionary;
 
         private const int SquareSize = 30;
         private GameOptions _currentGameOptions;
 
         private readonly int _formMargin;
+        private GridSquare _previousClickedSquare;
+
+        private bool _hasGameStarted;
 
         public MainForm()
         {
             InitializeComponent();
 
-            _formMargin = gridPanel.Location.X;
-
+            _formMargin = gridArea.Location.X;
+            _previousClickedSquare = new GridSquare(0, 0);
+            
             _currentGameOptions = OptionsForm.GetDefaultOptions();
             NewGame();
         }
@@ -30,110 +34,48 @@ namespace MinesweeperClone.UI
         private void NewGame()
         {
             timer.Stop();
+            gridArea.Visible = false;
+            _hasGameStarted = false;
 
             minesLeftLabel.Text = _currentGameOptions.GridMines.ToString();
             elapsedTimeLabel.Text = "0";
-            
-            AdjustControlsPosition();
 
             _minesweeper = new Minesweeper(_currentGameOptions.GridColumns, _currentGameOptions.GridRows,
                                            _currentGameOptions.GridMines);
 
-            _squares = new PictureBox[_currentGameOptions.GridRows, _currentGameOptions.GridColumns];
-            _squaresDictionary = new Dictionary<PictureBox, Tuple<int, int>>();
+            AdjustControlsPosition();
 
-            gridPanel.Visible = false;
-            gridPanel.Controls.Clear();
-            gridPanel.Visible = true;
-
-            for (int i = 0; i < _currentGameOptions.GridRows; i++)
-            {
-                for (int j = 0; j < _currentGameOptions.GridColumns; j++)
-                {
-                    PictureBox square = new PictureBox()
-                                            {
-                                                Name = Square.Unopened.ToString(),
-                                                Width = SquareSize,
-                                                Height = SquareSize,
-                                                Location = new Point(j * SquareSize, i * SquareSize),
-                                                Image = Properties.Resources.Unopened,
-                                                SizeMode = PictureBoxSizeMode.StretchImage,
-                                            };
-                    square.MouseDown += OnButtonMouseDown;
-
-                    gridPanel.Controls.Add(square);
-
-                    _squares[i, j] = square;
-                    _squaresDictionary.Add(square, new Tuple<int, int>(i, j));
-                }
-            }
-
-            gridPanel.Enabled = true;
-            timer.Start();
+            gridArea.Visible = true;
+            gridArea.Enabled = true;
         }
 
         private void AdjustControlsPosition()
         {
-            gridPanel.Width = _currentGameOptions.GridColumns * SquareSize;
-            gridPanel.Height = _currentGameOptions.GridRows * SquareSize;
+            gridArea.Width = _currentGameOptions.GridColumns * SquareSize;
+            gridArea.Height = _currentGameOptions.GridRows * SquareSize;
 
-            minesLeftLabel.Location = new Point(gridPanel.Location.X + gridPanel.Width - 35, minesLeftLabel.Location.Y);
-            minePicture.Location = new Point(gridPanel.Location.X + gridPanel.Width - 68, minePicture.Location.Y);
+            backgroundPanel.Width = gridArea.Width;
+            backgroundPanel.Height = gridArea.Height;
+            backgroundPanel.Location = gridArea.Location;
+            
+            minesLeftLabel.Location = new Point(gridArea.Location.X + gridArea.Width - 35, minesLeftLabel.Location.Y);
+            minePicture.Location = new Point(gridArea.Location.X + gridArea.Width - 68, minePicture.Location.Y);
 
-            ClientSize = new Size(gridPanel.Location.X + gridPanel.Width + _formMargin,
-                                  gridPanel.Location.Y + gridPanel.Height + menu.Height + _formMargin);
+            ClientSize = new Size(gridArea.Location.X + gridArea.Width + _formMargin,
+                                  gridArea.Location.Y + gridArea.Height + menu.Height + _formMargin);
 
             CenterToScreen();
         }
 
-        private void OnButtonMouseDown(object sender, MouseEventArgs e)
+        private void RevealSquare(int row, int column)
         {
-            PictureBox clickedSquare = (PictureBox)sender;
-
-            if (clickedSquare.Name == Square.Unopened.ToString() || clickedSquare.Name == "Flag")
-            {
-                if (e.Button == MouseButtons.Left)
-                {
-                    RevealSquare(clickedSquare);
-
-                    if (_minesweeper.SquaresLeft == _currentGameOptions.GridMines)
-                    {
-                        GameWon();
-                    }
-                }
-                else if (e.Button == MouseButtons.Right)
-                {
-                    if (clickedSquare.Name == "Flag")
-                    {
-                        clickedSquare.Name = Square.Unopened.ToString();
-                        clickedSquare.Image = Properties.Resources.Unopened;
-                        minesLeftLabel.Text = (int.Parse(minesLeftLabel.Text) + 1).ToString();
-                    }
-                    else
-                    {
-                        clickedSquare.Name = "Flag";
-                        clickedSquare.Image = Properties.Resources.Flag;
-                        minesLeftLabel.Text = (int.Parse(minesLeftLabel.Text) - 1).ToString();
-                    }
-                }
-            }
-        }
-
-        private void RevealSquare(PictureBox squareToReveal)
-        {
-            if (squareToReveal.Name != Square.Unopened.ToString())
+            if (_minesweeper[row, column] != Square.Unopened)
             {
                 return;
             }
             
-            int row = _squaresDictionary[squareToReveal].Item1;
-            int column = _squaresDictionary[squareToReveal].Item2;
-
             Square revealedSquare = _minesweeper.RevealSquare(row, column);
-
-            Bitmap image = (Bitmap)Properties.Resources.ResourceManager.GetObject(revealedSquare.ToString());
-            squareToReveal.Image = image;
-            squareToReveal.Name = revealedSquare.ToString();
+            DrawImage(gridArea.CreateGraphics(), revealedSquare, row, column);
 
             if (revealedSquare == Square.Mine)
             {
@@ -141,17 +83,18 @@ namespace MinesweeperClone.UI
             }
             else if (revealedSquare == Square.Blank)
             {
-                foreach (Tuple<int, int> adjacentSquare in _minesweeper.GetAdjacentSquares(row, column))
+                foreach (GridSquare adjacentSquare in _minesweeper.GetAdjacentSquares(row, column))
                 {
-                    RevealSquare(_squares[adjacentSquare.Item1, adjacentSquare.Item2]);
+                    RevealSquare(adjacentSquare.Row, adjacentSquare.Column);
                 }
             }
         }
 
         private void GameLost()
-        {
+        {           
             timer.Stop();
-            gridPanel.Enabled = false;
+            gridArea.Enabled = false;
+            _hasGameStarted = false;
 
             MessageBox.Show("You Lost :(", "Minesweeper");
             ShowMines();
@@ -160,7 +103,8 @@ namespace MinesweeperClone.UI
         private void GameWon()
         {
             timer.Stop();
-            gridPanel.Enabled = false;
+            gridArea.Enabled = false;
+            _hasGameStarted = false;
 
             MessageBox.Show("You Won!", "Minesweeper");
             ShowMines();
@@ -168,10 +112,11 @@ namespace MinesweeperClone.UI
 
         private void ShowMines()
         {
-            foreach (Tuple<int, int> mine in _minesweeper.GetAllMines())
+            foreach (GridSquare mine in _minesweeper.GetAllMines())
             {
-                _squares[mine.Item1, mine.Item2].Image = Properties.Resources.Mine;
+                _minesweeper[mine.Row, mine.Column] = Square.Mine;                
             }
+            gridArea.Invalidate();
         }
 
         private void exitMenu_Click(object sender, EventArgs e)
@@ -186,12 +131,113 @@ namespace MinesweeperClone.UI
 
         private void optionsMenu_Click(object sender, EventArgs e)
         {
-            new OptionsForm(_currentGameOptions).ShowDialog();
+            if (new OptionsForm(_currentGameOptions).ShowDialog() == DialogResult.OK)
+            {
+                NewGame();
+            }
         }
 
         private void timer_Tick(object sender, EventArgs e)
         {
             elapsedTimeLabel.Text = (int.Parse(elapsedTimeLabel.Text) + 1).ToString();
+        }
+
+        private void gridArea_Paint(object sender, PaintEventArgs e)
+        {
+            for (int i = 0; i < _currentGameOptions.GridRows; i++)
+            {
+                for (int j = 0; j < _currentGameOptions.GridColumns; j++)
+                {
+                    DrawImage(e.Graphics, _minesweeper[i, j], i, j);
+                }
+            }
+        }
+
+        private void gridArea_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (!_hasGameStarted)
+            {
+                _hasGameStarted = true;
+                timer.Start();
+            }
+
+            GridSquare clickedSquare = GetClickedSquare(e.X, e.Y);
+
+            if (_minesweeper[clickedSquare.Row, clickedSquare.Column] == Square.Unopened || 
+                _minesweeper[clickedSquare.Row, clickedSquare.Column] == Square.Flag)
+            {
+                if (e.Button == MouseButtons.Left)
+                {
+                    RevealSquare(clickedSquare.Row, clickedSquare.Column);
+
+                    if (_minesweeper.SquaresLeft == _currentGameOptions.GridMines)
+                    {
+                        GameWon();
+                    }
+                }
+                else if (e.Button == MouseButtons.Right)
+                {
+                    Square square;
+
+                    if (_minesweeper[clickedSquare.Row, clickedSquare.Column] == Square.Flag)
+                    {
+                        minesLeftLabel.Text = (int.Parse(minesLeftLabel.Text) + 1).ToString();
+                        square = _minesweeper[clickedSquare.Row, clickedSquare.Column] = Square.Unopened;
+                    }
+                    else
+                    {
+                        minesLeftLabel.Text = (int.Parse(minesLeftLabel.Text) - 1).ToString();
+                        square = _minesweeper[clickedSquare.Row, clickedSquare.Column] = Square.Flag;
+                    }
+
+                    DrawImage(gridArea.CreateGraphics(), square, clickedSquare.Row, clickedSquare.Column);
+                }
+            }
+        }
+
+        private GridSquare GetClickedSquare(int x, int y)
+        {
+            return new GridSquare(y / SquareSize, x / SquareSize);
+        }
+
+        private void gridArea_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!_hasGameStarted)
+            {
+                return;
+            }
+            
+            GridSquare clickedSquare = GetClickedSquare(e.X, e.Y);
+
+            if (clickedSquare.Row != _previousClickedSquare.Row ||
+                clickedSquare.Column != _previousClickedSquare.Column)
+            {
+                if (_minesweeper[clickedSquare.Row, clickedSquare.Column] == Square.Unopened)
+                {
+                    DrawImage(gridArea.CreateGraphics(), Properties.Resources.UnopenedBright, clickedSquare.Row,
+                              clickedSquare.Column);
+                }
+                
+                if (_minesweeper[_previousClickedSquare.Row,_previousClickedSquare.Column] == Square.Unopened)
+                {
+                    DrawImage(gridArea.CreateGraphics(), Properties.Resources.Unopened, _previousClickedSquare.Row,
+                              _previousClickedSquare.Column);
+                }    
+            }
+
+            _previousClickedSquare.Row = clickedSquare.Row;
+            _previousClickedSquare.Column = clickedSquare.Column;
+        }
+
+        private void DrawImage(Graphics g, Bitmap image, int row, int column)
+        {
+            g.DrawImage(image, column * SquareSize, row * SquareSize, SquareSize, SquareSize);   
+        }
+
+        private void DrawImage(Graphics g, Square square, int row, int column)
+        {
+            Bitmap image = (Bitmap)Properties.Resources.ResourceManager.GetObject(square.ToString());
+            g.DrawImage(image, column * SquareSize, row * SquareSize, SquareSize, SquareSize);
         }
     }
 }

@@ -13,6 +13,7 @@ namespace MinesweeperClone.Logic
         public int SquaresLeft { get; private set; }
         
         private Square[,] _grid;
+        private List<int> _minesLocation;
 
         public Minesweeper(int columns, int rows, int mines)
         {
@@ -21,6 +22,7 @@ namespace MinesweeperClone.Logic
             Mines = mines;
 
             _grid = new Square[Rows,Columns];
+            _minesLocation = new List<int>();
 
             ResetGrid();
         }
@@ -29,9 +31,10 @@ namespace MinesweeperClone.Logic
         {
             int minesCount = 0;
 
-            foreach (Tuple<int, int> adjacentSquare in GetAdjacentSquares(row, column))
+            foreach (GridSquare adjacentSquare in GetAdjacentSquares(row, column))
             {
-                if (_grid[adjacentSquare.Item1,adjacentSquare.Item2] == Square.Mine)
+                int mineLocation = (adjacentSquare.Row * Rows) + adjacentSquare.Column;
+                if (_minesLocation.Contains(mineLocation))
                 {
                     minesCount++;
                 }
@@ -40,9 +43,9 @@ namespace MinesweeperClone.Logic
             return minesCount;
         }
 
-        public Tuple<int, int>[] GetAdjacentSquares(int row, int column)
+        public GridSquare[] GetAdjacentSquares(int row, int column)
         {
-            List<Tuple<int, int>> adjacentSquares = new List<Tuple<int, int>>();
+            List<GridSquare> adjacentSquares = new List<GridSquare>();
 
             /* some loops to get the adjacent squares in a grid to a given row and column. The ugly
              * conditions are for boundaries checking */
@@ -52,7 +55,7 @@ namespace MinesweeperClone.Logic
                 {
                     if (i != 0 || j != 0)
                     {
-                        adjacentSquares.Add(new Tuple<int, int>(row + i, column + j));
+                        adjacentSquares.Add(new GridSquare(row + i, column + j));
                     }
                 }
             }
@@ -62,30 +65,26 @@ namespace MinesweeperClone.Logic
 
         public Square RevealSquare(int row, int column)
         {
-            Square square = _grid[row,column];
-
-            if (square == Square.Unopened)
+            if (_grid[row, column] == Square.Unopened)
             {
-                _grid[row, column] = (Square)CountAdjacentMines(row, column);
+                int mineLocation = (row * Rows) + column;
+                _grid[row, column] = _minesLocation.Contains(mineLocation)
+                                         ? Square.Mine
+                                         : (Square)CountAdjacentMines(row, column);
+
                 SquaresLeft--;
             }
-
+            
             return _grid[row, column];
         }
 
-        public Tuple<int, int>[] GetAllMines()
+        public GridSquare[] GetAllMines()
         {
-            List<Tuple<int, int>> mines = new List<Tuple<int, int>>();
+            List<GridSquare> mines = new List<GridSquare>();
 
-            for (int i = 0; i < Rows; i++)
+            foreach (int mine in _minesLocation)
             {
-                for (int j = 0; j < Columns; j++)
-                {
-                    if (_grid[i,j] == Square.Mine)
-                    {
-                        mines.Add(new Tuple<int, int>(i,j));
-                    }
-                }
+                mines.Add(new GridSquare(mine / Columns, mine % Columns));
             }
 
             return mines.ToArray();
@@ -94,6 +93,7 @@ namespace MinesweeperClone.Logic
         public Square this[int row, int column]
         {
             get { return _grid[row, column]; }
+            set { _grid[row, column] = value; }
         }
 
         private void ResetGrid()
@@ -113,7 +113,7 @@ namespace MinesweeperClone.Logic
 
         private void FillWithMines()
         {
-            List<int> placedMinesPosition = new List<int>();
+            _minesLocation.Clear();
             Random random = new Random(DateTime.Now.Millisecond);
 
             for (int i = 0; i < Mines; i++)
@@ -123,10 +123,9 @@ namespace MinesweeperClone.Logic
                 do
                 {
                     minePosition = random.Next(0, Rows * Columns);
-                } while (placedMinesPosition.Contains(minePosition));
-
-                _grid[minePosition / Columns, minePosition % Columns] = Square.Mine;                
-                placedMinesPosition.Add(minePosition);
+                } while (_minesLocation.Contains(minePosition));
+            
+                _minesLocation.Add(minePosition);
             }
         }
     }

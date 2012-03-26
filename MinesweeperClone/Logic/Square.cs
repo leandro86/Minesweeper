@@ -17,6 +17,7 @@ namespace MinesweeperClone.Logic
         Six,
         Seven,
         Eight,
+        Flag,
         Mine,
     }
 }
