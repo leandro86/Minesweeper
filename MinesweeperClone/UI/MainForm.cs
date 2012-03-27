@@ -90,7 +90,8 @@ namespace MinesweeperClone.UI
                         _minesweeper.RearrangeForBlankSquare(row, column);
                         revealedSquare = Square.Blank;
                     }
-                    _currentGameState = GameState.Playing;                    
+                    _currentGameState = GameState.Playing;    
+                    timer.Start();
                 }
 
                 DrawImage(gridArea.CreateGraphics(), revealedSquare, row, column);
