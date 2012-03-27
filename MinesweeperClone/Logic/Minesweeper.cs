@@ -13,7 +13,7 @@ namespace MinesweeperClone.Logic
         public int SquaresLeft { get; private set; }
         
         private Square[,] _grid;
-        private List<int> _minesLocation;
+        private HashSet<int> _minesLocation;
 
         public Minesweeper(int rows, int columns, int mines)
         {
@@ -22,7 +22,7 @@ namespace MinesweeperClone.Logic
             Mines = mines;
 
             _grid = new Square[Rows,Columns];
-            _minesLocation = new List<int>();
+            _minesLocation = new HashSet<int>();
 
             ResetGrid();
         }
@@ -94,6 +94,61 @@ namespace MinesweeperClone.Logic
         {
             get { return _grid[row, column]; }
             set { _grid[row, column] = value; }
+        }
+
+        /* Given a row and a column, this method will rearrange the grid in order to clear all mines adjacent to
+         * the square, and it's going to move those mines to other squares. In the current implementation, the mines
+         * are moved starting at the [0, 0] square, then [0, 1], and so on. A better way will be to modify the method
+         * "GetSafeUnopenedSquares" to return squares at random. */
+        public void RearrangeForBlankSquare(int row, int column)
+        {            
+            List<GridSquare> adjacentSquares = new List<GridSquare>(GetAdjacentSquares(row, column))
+                                                   {
+                                                       new GridSquare(row, column)
+                                                   };
+            GridSquare[] mines = adjacentSquares.Where(s => _minesLocation.Contains((s.Row * Columns) + s.Column)).ToArray();
+            GridSquare[] safeUnopenedSquares = GetSafeUnopenedSquares(mines.Count(), adjacentSquares);
+
+            for (int i = 0; i < safeUnopenedSquares.Length; i++)
+            {
+                _grid[mines[i].Row, mines[i].Column] = Square.Unopened;
+
+                _minesLocation.Remove((mines[i].Row * Columns) + mines[i].Column);
+                _minesLocation.Add((safeUnopenedSquares[i].Row * Columns) + safeUnopenedSquares[i].Column);              
+            }
+
+            _grid[row, column] = Square.Blank;
+        }
+
+        private GridSquare[] GetSafeUnopenedSquares(int squaresToGet, IEnumerable<GridSquare> squaresException)
+        {
+            List<GridSquare> safeUnopenedSquares = new List<GridSquare>();
+
+            int i = 0;
+            while (i < Rows &&  safeUnopenedSquares.Count != squaresToGet)
+            {
+                int j = 0;
+                while (j < Columns && safeUnopenedSquares.Count != squaresToGet)
+                {
+                    int square = (i * Columns) + j;
+
+                    if (_grid[i, j] == Square.Unopened && 
+                        !_minesLocation.Contains(square) && 
+                        squaresException.FirstOrDefault(s => s.Row == i && s.Column == j) == null)
+                    {
+                        safeUnopenedSquares.Add(new GridSquare(i, j));
+                    }
+                    j++;
+                }
+                i++;
+            }
+
+            if (safeUnopenedSquares.Count != squaresToGet)
+            {
+                throw new Exception("Unable to get requested number of squares");
+            }
+
+            return safeUnopenedSquares.ToArray();
         }
 
         private void ResetGrid()

@@ -77,11 +77,22 @@ namespace MinesweeperClone.UI
             CenterToScreen();
         }
 
-        private Square RevealSquare(int row, int column)
+        private void RevealSquare(int row, int column)
         {
             if (_minesweeper[row, column] == Square.Unopened)
             {
                 Square revealedSquare = _minesweeper.RevealSquare(row, column);
+
+                if (_currentGameState == GameState.NotStarted)
+                {
+                    if (revealedSquare != Square.Blank)
+                    {
+                        _minesweeper.RearrangeForBlankSquare(row, column);
+                        revealedSquare = Square.Blank;
+                    }
+                    _currentGameState = GameState.Playing;                    
+                }
+
                 DrawImage(gridArea.CreateGraphics(), revealedSquare, row, column);
 
                 if (revealedSquare == Square.Mine)
@@ -97,7 +108,10 @@ namespace MinesweeperClone.UI
                 }
             }
 
-            return _minesweeper[row, column];
+            if (_minesweeper.SquaresLeft == _currentGameOptions.GridMines)
+            {
+                GameEnded(true);
+            }
         }
 
         private void GameEnded(bool won)
@@ -163,11 +177,6 @@ namespace MinesweeperClone.UI
                 if (e.Button == MouseButtons.Left)
                 {
                     RevealSquare(clickedSquare.Row, clickedSquare.Column);
-
-                    if (_minesweeper.SquaresLeft == _currentGameOptions.GridMines)
-                    {
-                        GameEnded(true);
-                    }
                 }
                 else if (e.Button == MouseButtons.Right)
                 {
@@ -186,12 +195,6 @@ namespace MinesweeperClone.UI
 
                     DrawImage(gridArea.CreateGraphics(), square, clickedSquare.Row, clickedSquare.Column);
                 }
-            }
-
-            if (_currentGameState == GameState.NotStarted)
-            {
-                timer.Start();
-                _currentGameState = GameState.Playing;
             }
         }
 
@@ -240,14 +243,6 @@ namespace MinesweeperClone.UI
             g.DrawImage(image, column * SquareSize, row * SquareSize, SquareSize, SquareSize);
         }
 
-        private void ShowMines()
-        {
-            foreach (GridSquare mine in _minesweeper.GetAllMines())
-            {
-                DrawImage(gridArea.CreateGraphics(), Square.Mine, mine.Row, mine.Column);
-            }
-        }
-
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
             //TODO: remove, only for testing
@@ -256,6 +251,14 @@ namespace MinesweeperClone.UI
                 ShowMines();
             }
             gridArea.Invalidate();
+        }
+
+        private void ShowMines()
+        {
+            foreach (GridSquare mine in _minesweeper.GetAllMines())
+            {
+                DrawImage(gridArea.CreateGraphics(), Square.Mine, mine.Row, mine.Column);
+            }
         }
     }
 }
