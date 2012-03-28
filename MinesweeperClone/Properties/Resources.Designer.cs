@@ -67,6 +67,13 @@ namespace MinesweeperClone.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap BigSmileFace {
+            get {
+                object obj = ResourceManager.GetObject("BigSmileFace", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap Blank {
             get {
                 object obj = ResourceManager.GetObject("Blank", resourceCulture);
@@ -77,6 +84,13 @@ namespace MinesweeperClone.Properties {
         internal static System.Drawing.Bitmap Clock {
             get {
                 object obj = ResourceManager.GetObject("Clock", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap CryingFace {
+            get {
+                object obj = ResourceManager.GetObject("CryingFace", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -126,6 +140,13 @@ namespace MinesweeperClone.Properties {
         internal static System.Drawing.Bitmap One {
             get {
                 object obj = ResourceManager.GetObject("One", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap PlainFace {
+            get {
+                object obj = ResourceManager.GetObject("PlainFace", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

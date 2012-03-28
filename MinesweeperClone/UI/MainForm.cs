@@ -57,6 +57,8 @@ namespace MinesweeperClone.UI
 
             gridArea.Visible = true;
             gridArea.Enabled = true;
+
+            facePicture.Image = Properties.Resources.PlainFace;
         }
 
         private void AdjustControlsPosition()
@@ -70,6 +72,8 @@ namespace MinesweeperClone.UI
             
             minesLeftLabel.Location = new Point(gridArea.Location.X + gridArea.Width - 35, minesLeftLabel.Location.Y);
             minePicture.Location = new Point(gridArea.Location.X + gridArea.Width - 68, minePicture.Location.Y);
+
+            facePicture.Location = new Point(gridArea.Width / 2 - gridArea.Location.X, facePicture.Location.Y);
 
             ClientSize = new Size(gridArea.Location.X + gridArea.Width + _formMargin,
                                   gridArea.Location.Y + gridArea.Height + menu.Height + _formMargin);
@@ -119,9 +123,9 @@ namespace MinesweeperClone.UI
         {
             timer.Stop();
             gridArea.Enabled = false;
-            _currentGameState = GameState.Ended;            
+            _currentGameState = GameState.Ended;
 
-            MessageBox.Show(won ? "You Won!" : "You Lost :(", "Minesweeper");
+            facePicture.Image = won ? Properties.Resources.BigSmileFace : Properties.Resources.CryingFace;
             RevealMines();
         }
 

@@ -38,6 +38,7 @@
             this.exitMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.timer = new System.Windows.Forms.Timer(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
+            this.facePicture = new System.Windows.Forms.PictureBox();
             this.gridArea = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.minePicture = new System.Windows.Forms.PictureBox();
@@ -46,6 +47,7 @@
             this.backgroundPanel = new System.Windows.Forms.Panel();
             this.menu.SuspendLayout();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.facePicture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridArea)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.minePicture)).BeginInit();
@@ -109,6 +111,7 @@
             this.panel1.BackColor = System.Drawing.Color.LightSteelBlue;
             this.panel1.BackgroundImage = global::MinesweeperClone.Properties.Resources.Background1;
             this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.panel1.Controls.Add(this.facePicture);
             this.panel1.Controls.Add(this.gridArea);
             this.panel1.Controls.Add(this.pictureBox2);
             this.panel1.Controls.Add(this.minePicture);
@@ -121,11 +124,23 @@
             this.panel1.Size = new System.Drawing.Size(278, 344);
             this.panel1.TabIndex = 1;
             // 
+            // facePicture
+            // 
+            this.facePicture.BackColor = System.Drawing.Color.Transparent;
+            this.facePicture.Image = global::MinesweeperClone.Properties.Resources.PlainFace;
+            this.facePicture.Location = new System.Drawing.Point(116, 3);
+            this.facePicture.Name = "facePicture";
+            this.facePicture.Size = new System.Drawing.Size(40, 41);
+            this.facePicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.facePicture.TabIndex = 16;
+            this.facePicture.TabStop = false;
+            // 
             // gridArea
             // 
+            this.gridArea.BackColor = System.Drawing.Color.Transparent;
             this.gridArea.Location = new System.Drawing.Point(12, 45);
             this.gridArea.Name = "gridArea";
-            this.gridArea.Size = new System.Drawing.Size(254, 287);
+            this.gridArea.Size = new System.Drawing.Size(254, 236);
             this.gridArea.TabIndex = 14;
             this.gridArea.TabStop = false;
             this.gridArea.Paint += new System.Windows.Forms.PaintEventHandler(this.gridArea_Paint);
@@ -179,9 +194,9 @@
             // backgroundPanel
             // 
             this.backgroundPanel.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("backgroundPanel.BackgroundImage")));
-            this.backgroundPanel.Location = new System.Drawing.Point(125, 9);
+            this.backgroundPanel.Location = new System.Drawing.Point(12, 287);
             this.backgroundPanel.Name = "backgroundPanel";
-            this.backgroundPanel.Size = new System.Drawing.Size(48, 30);
+            this.backgroundPanel.Size = new System.Drawing.Size(254, 54);
             this.backgroundPanel.TabIndex = 15;
             // 
             // MainForm
@@ -202,6 +217,7 @@
             this.menu.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.facePicture)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridArea)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.minePicture)).EndInit();
@@ -226,6 +242,7 @@
         private System.Windows.Forms.Timer timer;
         private System.Windows.Forms.PictureBox gridArea;
         private System.Windows.Forms.Panel backgroundPanel;
+        private System.Windows.Forms.PictureBox facePicture;
 
     }
 }
