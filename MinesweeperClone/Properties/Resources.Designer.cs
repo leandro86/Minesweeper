@@ -179,9 +179,9 @@ namespace MinesweeperClone.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap UnopenedBright {
+        internal static System.Drawing.Bitmap UnopenedSelected {
             get {
-                object obj = ResourceManager.GetObject("UnopenedBright", resourceCulture);
+                object obj = ResourceManager.GetObject("UnopenedSelected", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

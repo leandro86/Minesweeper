@@ -136,9 +136,6 @@
     <None Include="Resources\One.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\UnopenedBright.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\PlainFace.png" />
   </ItemGroup>
   <ItemGroup>
@@ -146,6 +143,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\CryingFace.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UnopenedSelected.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

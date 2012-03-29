@@ -145,7 +145,9 @@
             this.gridArea.TabStop = false;
             this.gridArea.Paint += new System.Windows.Forms.PaintEventHandler(this.gridArea_Paint);
             this.gridArea.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridArea_MouseDown);
+            this.gridArea.MouseLeave += new System.EventHandler(this.gridArea_MouseLeave);
             this.gridArea.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gridArea_MouseMove);
+            this.gridArea.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gridArea_MouseUp);
             // 
             // pictureBox2
             // 

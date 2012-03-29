@@ -171,70 +171,105 @@ namespace MinesweeperClone.UI
                 }
             }
         }
-
-        private void gridArea_MouseDown(object sender, MouseEventArgs e)
+        
+        private void gridArea_MouseUp(object sender, MouseEventArgs e)
         {
-            GridSquare clickedSquare = GetClickedSquare(e.X, e.Y);
+            GridSquare clickedSquare = ConvertToSquare(e.X, e.Y);
+            if (clickedSquare.Row < 0 || clickedSquare.Column < 0 ||
+                clickedSquare.Row > _currentGameOptions.GridRows - 1 ||
+                clickedSquare.Column > _currentGameOptions.GridColumns - 1)
+            {
+                return;
+            }
 
-            if (_minesweeper[clickedSquare.Row, clickedSquare.Column] == Square.Unopened || 
+            if (_minesweeper[clickedSquare.Row, clickedSquare.Column] == Square.Unopened ||
                 _minesweeper[clickedSquare.Row, clickedSquare.Column] == Square.Flag)
             {
                 if (e.Button == MouseButtons.Left)
                 {
                     RevealSquare(clickedSquare.Row, clickedSquare.Column);
                 }
-                else if (e.Button == MouseButtons.Right)
-                {
-                    Square square;
-
-                    if (_minesweeper[clickedSquare.Row, clickedSquare.Column] == Square.Flag)
-                    {
-                        minesLeftLabel.Text = (int.Parse(minesLeftLabel.Text) + 1).ToString();
-                        square = _minesweeper[clickedSquare.Row, clickedSquare.Column] = Square.Unopened;
-                    }
-                    else
-                    {
-                        minesLeftLabel.Text = (int.Parse(minesLeftLabel.Text) - 1).ToString();
-                        square = _minesweeper[clickedSquare.Row, clickedSquare.Column] = Square.Flag;
-                    }
-
-                    DrawImage(gridArea.CreateGraphics(), square, clickedSquare.Row, clickedSquare.Column);
-                }
             }
         }
 
-        private GridSquare GetClickedSquare(int x, int y)
+        private void gridArea_MouseDown(object sender, MouseEventArgs e)
         {
-            return new GridSquare(y / SquareSize, x / SquareSize);
+            GridSquare clickedSquare = ConvertToSquare(e.X, e.Y);        
+
+            if (e.Button == MouseButtons.Left)
+            {
+                if (_minesweeper[clickedSquare.Row, clickedSquare.Column] == Square.Unopened)
+                {
+                    DrawImage(gridArea.CreateGraphics(), Square.Blank, clickedSquare.Row, clickedSquare.Column);
+                }
+            }
+            else if (e.Button == MouseButtons.Right)
+            {
+                if (_minesweeper[clickedSquare.Row, clickedSquare.Column] == Square.Flag)
+                {
+                    minesLeftLabel.Text = (int.Parse(minesLeftLabel.Text) + 1).ToString();
+                    _minesweeper[clickedSquare.Row, clickedSquare.Column] = Square.Unopened;
+                    DrawImage(gridArea.CreateGraphics(), Square.Unopened, clickedSquare.Row, clickedSquare.Column);
+                }
+                else if (_minesweeper[clickedSquare.Row, clickedSquare.Column] == Square.Unopened)
+                {
+                    minesLeftLabel.Text = (int.Parse(minesLeftLabel.Text) - 1).ToString();
+                    _minesweeper[clickedSquare.Row, clickedSquare.Column] = Square.Flag;
+                    DrawImage(gridArea.CreateGraphics(), Square.Flag, clickedSquare.Row, clickedSquare.Column);
+                }
+            }
         }
 
         private void gridArea_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_currentGameState != GameState.Playing)
+            GridSquare hoveredSquare = ConvertToSquare(e.X, e.Y);
+            if (hoveredSquare.Row < 0 || hoveredSquare.Column < 0 ||
+                hoveredSquare.Row > _currentGameOptions.GridRows - 1 || 
+                hoveredSquare.Column > _currentGameOptions.GridColumns - 1)
             {
                 return;
             }
-            
-            GridSquare clickedSquare = GetClickedSquare(e.X, e.Y);
 
-            if (clickedSquare.Row != _previousClickedSquare.Row ||
-                clickedSquare.Column != _previousClickedSquare.Column)
+            Bitmap image = Properties.Resources.UnopenedSelected;
+
+            if (e.Button == MouseButtons.Left)
             {
-                if (_minesweeper[clickedSquare.Row, clickedSquare.Column] == Square.Unopened)
+                image = Properties.Resources.Blank;
+            }
+
+            if (hoveredSquare.Row != _previousClickedSquare.Row ||
+                hoveredSquare.Column != _previousClickedSquare.Column)
+            {
+                if (_minesweeper[hoveredSquare.Row, hoveredSquare.Column] == Square.Unopened)
                 {
-                    DrawImage(gridArea.CreateGraphics(), Properties.Resources.UnopenedBright, clickedSquare.Row,
-                              clickedSquare.Column);
+                    DrawImage(gridArea.CreateGraphics(), image, hoveredSquare.Row,
+                              hoveredSquare.Column);
                 }
-                
-                if (_minesweeper[_previousClickedSquare.Row,_previousClickedSquare.Column] == Square.Unopened)
+
+                if (_minesweeper[_previousClickedSquare.Row, _previousClickedSquare.Column] == Square.Unopened)
                 {
                     DrawImage(gridArea.CreateGraphics(), Properties.Resources.Unopened, _previousClickedSquare.Row,
                               _previousClickedSquare.Column);
-                }    
+                }
             }
 
-            _previousClickedSquare.Row = clickedSquare.Row;
-            _previousClickedSquare.Column = clickedSquare.Column;
+            _previousClickedSquare.Row = hoveredSquare.Row;
+            _previousClickedSquare.Column = hoveredSquare.Column;
+        }
+
+        private void gridArea_MouseLeave(object sender, EventArgs e)
+        {
+            if (_minesweeper[_previousClickedSquare.Row, _previousClickedSquare.Column] == Square.Unopened)
+            {
+                DrawImage(gridArea.CreateGraphics(), Square.Unopened, _previousClickedSquare.Row,
+                          _previousClickedSquare.Column);
+
+            }
+        }
+
+        private GridSquare ConvertToSquare(int x, int y)
+        {
+            return new GridSquare(y / SquareSize, x / SquareSize);
         }
 
         private void DrawImage(Graphics g, Bitmap image, int row, int column)
